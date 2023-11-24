@@ -24,8 +24,9 @@ public class Producto {
 	@Column(nullable = false)
 	private Long unidades;
 
-	@Column(nullable = true, length = 10000)
+	@Column(nullable = true)
 	private String photos;
+
 
 	@Column(nullable = false)
 	private  Long precio;

@@ -6,10 +6,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.daniel.ecommerce.entity.Comentario;
-import com.daniel.ecommerce.entity.Compra;
 import com.daniel.ecommerce.repository.ProductoRepository;
 import com.daniel.ecommerce.service.ComentarioService;
-import com.daniel.ecommerce.service.CompraService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
@@ -30,8 +28,7 @@ public class ProductoController {
 	@Autowired
 	private ComentarioService comentarioService;
 
-	@Autowired
-	private CompraService compraService;
+
 
 
 	@RequestMapping("/")
@@ -77,14 +74,16 @@ public class ProductoController {
 		}
 
 		// Guardar la foto del producto
+		String photosPath = "uploads/" + photos.getOriginalFilename();
 		try {
-			photos.transferTo(new File("/static/uploads/" + photos.getOriginalFilename()));
+			photos.transferTo(new File(photosPath));
 		} catch (IOException e) {
 			e.printStackTrace();
 			return "redirect:/";
 		}
 
-		producto.setPhotos("uploads/" + photos.getOriginalFilename());
+		// Actualizar la propiedad photos del objeto Producto
+		producto.setPhotos(photosPath);
 
 		productoService.save(producto);
 
@@ -111,29 +110,7 @@ public class ProductoController {
 	}
 
 
-	@PostMapping("/producto/{id}/realizarCompra")
-	public String realizarCompra(@PathVariable Long id, @RequestParam("cantidad") Integer cantidad,
-								 @RequestParam("nombreCliente") String nombreCliente,
-								 @RequestParam("direccion") String direccion,
-								 @RequestParam("tipoTarjeta") String tipoTarjeta) {
-		// Get the product from the repository
-		Producto producto = productoService.get(id);
 
-		// Create a new purchase object
-		Compra compra = new Compra();
-		compra.setProducto(producto);
-		compra.setCantidad(cantidad);
-		compra.setNombreCliente(nombreCliente);
-		compra.setDireccion(direccion);
-		compra.setTipoTarjeta(tipoTarjeta);
-		compra.setPrecio(producto.getPrecio() * cantidad);
-
-		// Save the purchase using the service
-		compraService.guardarCompra(compra);
-
-		// Redirect to the purchase confirmation page
-		return "redirect:/compra/confirmacion/" + compra.getId();
-	}
 }
 
 
